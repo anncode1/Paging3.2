@@ -2,9 +2,14 @@ package com.anncode.paging32.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.anncode.paging32.MyApplication
 import com.anncode.paging32.databinding.ActivityMainBinding
 import com.anncode.paging32.presentation.view.PokemonAdapter
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -16,16 +21,22 @@ class MainActivity : AppCompatActivity() {
         (applicationContext as MyApplication).appComponent.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding?.root
+        setContentView(view)
 
         val pokemonAdapter = PokemonAdapter()
         binding?.apply {
+            rvPokemons.layoutManager = LinearLayoutManager(this@MainActivity)
             rvPokemons.setHasFixedSize(true)
             rvPokemons.adapter = pokemonAdapter
         }
 
-        mainActivityViewModel.pokemons.observe(this, {
-            pokemonAdapter.submitData(lifecycle, it)
-        })
+
+        lifecycleScope.launch {
+            mainActivityViewModel.pokemons.collect {
+                pokemonAdapter.submitData(it)
+            }
+        }
 
     }
 

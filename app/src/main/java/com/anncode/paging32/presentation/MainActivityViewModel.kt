@@ -1,10 +1,10 @@
 package com.anncode.paging32.presentation
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.anncode.paging32.data.model.Pokemon
 import com.anncode.paging32.data.repository.PokemonRepository
-import com.anncode.paging32.utils.Result
 import javax.inject.Inject
 
 /**
@@ -14,17 +14,7 @@ class MainActivityViewModel @Inject constructor(
     pokemonRepository: PokemonRepository
 ) : ViewModel() {
 
-    /*val result: MutableLiveData<Result<List<Pokemon>>> = MutableLiveData(Result.Loading)
-    val pokemons = Transformations.switchMap(result) {
-        val po = pokemonRepository.getPokemons().cachedIn(viewModelScope)
-        result.postValue(po.value)
-        po
-    }*/
-
-    val lala = MutableLiveData("")
-    val pokemons = lala.switchMap {
-        pokemonRepository.getPokemons().cachedIn(viewModelScope)
-    }
+    val pokemons = pokemonRepository.getPokemons().cachedIn(viewModelScope)
 
     class Factory(
         private val pokemonRepository: PokemonRepository

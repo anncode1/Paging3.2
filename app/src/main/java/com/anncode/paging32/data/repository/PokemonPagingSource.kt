@@ -15,29 +15,31 @@ class PokemonPagingSource(
     private val pokemonApiService: PokemonApiService
 ) : PagingSource<Int, Pokemon>() {
 
-    override fun getRefreshKey(state: PagingState<Int, Pokemon>): Int? = null
-
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Pokemon> {
         val page = params.key ?: FIRST_PAGE
         val size = params.loadSize
-        val pageSize = params.loadSize
-        val previousPage = if (page == FIRST_PAGE) null else page - 1
+        val previousPage = if (page == FIRST_PAGE) null else page - size
 
         return try {
             val pokemonResponse = pokemonApiService.getPokemons(page, size)
             val nextPage = if (pokemonResponse.pokemons.isEmpty()) {
                 null
-            } else page + (pageSize / pokemonResponse.dataSize)
+            } else page + size
             LoadResult.Page(
                 pokemonResponse.pokemons,
                 previousPage,
                 nextPage
             )
         } catch (exception: IOException) {
-            return LoadResult.Error(exception)
+            LoadResult.Error(exception)
         } catch (exception: HttpException) {
-            return LoadResult.Error(exception)
+            LoadResult.Error(exception)
         }
     }
+
+
+
+    
+    override fun getRefreshKey(state: PagingState<Int, Pokemon>): Int? = null
 
 }
